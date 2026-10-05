@@ -1,0 +1,21 @@
+{
+  "name": "teptris-wasm",
+  "version": "0.1.0",
+  "description": "TOML for JavaScript at libteptris speed (WebAssembly, no fallback)",
+  "type": "module",
+  "main": "dist/teptris.mjs",
+  "exports": {
+    ".": "./dist/teptris.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "./build.sh",
+    "test": "node --test test/test.mjs"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  }
+}
