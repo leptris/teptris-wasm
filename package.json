@@ -1,11 +1,11 @@
 {
   "name": "teptris-wasm",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "TOML for JavaScript at libteptris speed (WebAssembly, no fallback)",
   "type": "module",
-  "main": "dist/teptris.mjs",
+  "main": "src/index.js",
   "exports": {
-    ".": "./dist/teptris.mjs"
+    ".": "./src/index.js"
   },
   "files": [
     "dist"
