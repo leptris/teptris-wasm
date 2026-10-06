@@ -35,3 +35,38 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
       - run: npm test
+
+  browser-smoke:
+    name: browser smoke (headless chrome)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Checkout engine repository
+        uses: actions/checkout@v4
+        with:
+          repository: leptris/teptris
+          ref: main
+          path: teptris
+      - uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 3.1.74
+      - name: Build the module
+        shell: bash
+        run: bash build.sh
+        env:
+          ENGINESRC: ${{ github.workspace }}/teptris/src
+      - name: Serve and drive headless chrome
+        shell: bash
+        run: |
+          python3 -m http.server 8099 --bind 127.0.0.1 >/dev/null 2>&1 &
+          SRV=$!
+          sleep 1
+          for _ in $(seq 1 20); do
+            DOM=$(google-chrome --headless=new --disable-gpu --no-sandbox               --dump-dom http://127.0.0.1:8099/test/browser.html 2>/dev/null || true)
+            case "$DOM" in
+              *WASM-BROWSER-OK*) echo "$DOM" | grep -o "WASM-BROWSER-OK [0-9.]*"; kill $SRV; exit 0;;
+              *WASM-BROWSER-FAIL*) echo "$DOM"; kill $SRV; exit 1;;
+            esac
+            sleep 1
+          done
+          echo "browser smoke: no verdict within timeout"; kill $SRV; exit 1
