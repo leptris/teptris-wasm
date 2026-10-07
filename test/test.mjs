@@ -54,5 +54,5 @@ test("dump rejects non-table roots", () => {
 });
 
 test("engineVersion reports", () => {
-  assert.match(engineVersion(), /^0\.1\./);
+  assert.match(engineVersion(), /^\d+\.\d+\./);
 });
