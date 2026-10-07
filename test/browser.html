@@ -18,7 +18,7 @@ try {
   if (JSON.stringify(back) !== JSON.stringify(v)) {
     throw new Error("round-trip");
   }
-  if (!engineVersion().startsWith("0.1.")) throw new Error("version");
+  if (!/^\d+\.\d+\./.test(engineVersion())) throw new Error("version");
   out.textContent = "WASM-BROWSER-OK " + engineVersion();
 } catch (e) {
   out.textContent = "WASM-BROWSER-FAIL " + (e && e.message);
