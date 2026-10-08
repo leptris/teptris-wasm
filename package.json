@@ -1,6 +1,6 @@
 {
   "name": "teptris-wasm",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "TOML for JavaScript at libteptris speed (WebAssembly, no fallback) \u2014 version tracks the engine ({engine}.{iteration}; npm semver is 3-part)",
   "type": "module",
   "main": "src/index.js",
