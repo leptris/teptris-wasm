@@ -141,26 +141,53 @@ export function initApi(mod) {
     return value;
   }
 
-  function dump(obj) {
+  function buildTree(obj) {
     if (obj === null || typeof obj !== "object" || Array.isArray(obj)) {
       throw new TypeError("dump expects a table object (TOML roots are tables)");
     }
     const b = mod._teptris_wasm_builder_new();
     const errs = [];
+    // the root table is implicit: entries attach directly
+    for (const [k, item] of Object.entries(obj)) {
+      buildValue(mod, b, k, item, errs);
+    }
+    if (errs.length) {
+      mod._teptris_wasm_builder_free(b);
+      throw errs[0];
+    }
+    return b;
+  }
+
+  function readOut(ptr) {
+    const out = UTF8ToString(ptr);
+    mod._teptris_wasm_free(ptr);
+    return out;
+  }
+
+  function dump(obj) {
+    const b = buildTree(obj);
     try {
-      // the root table is implicit: entries attach directly
-      for (const [k, item] of Object.entries(obj)) {
-        buildValue(mod, b, k, item, errs);
-      }
-      if (errs.length) throw errs[0];
       const st = mod._teptris_wasm_builder_finish(b);
       if (st !== 0) {
         throw new Error(`dump failed (status ${st})`);
       }
-      const tptr = mod._teptris_wasm_toml();
-      const out = UTF8ToString(tptr);
-      mod._teptris_wasm_free(tptr);
-      return out;
+      return readOut(mod._teptris_wasm_toml());
+    } finally {
+      mod._teptris_wasm_builder_free(b);
+    }
+  }
+
+  // Natural JSON (engine 0.3.0): real numbers, booleans, RFC 3339
+  // datetime strings; non-finite floats become null. The string a
+  // host can hand straight to JSON consumers.
+  function dumpJson(obj) {
+    const b = buildTree(obj);
+    try {
+      const st = mod._teptris_wasm_builder_finish_json_natural(b);
+      if (st !== 0) {
+        throw new Error(`dumpJson failed (status ${st})`);
+      }
+      return readOut(mod._teptris_wasm_toml());
     } finally {
       mod._teptris_wasm_builder_free(b);
     }
@@ -170,7 +197,7 @@ export function initApi(mod) {
     return UTF8ToString(mod._teptris_version_string());
   }
 
-  return { loads, dump, engineVersion };
+  return { loads, dump, dumpJson, engineVersion };
 }
 
 export default initApi;

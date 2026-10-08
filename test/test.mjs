@@ -4,7 +4,7 @@ import init from "../dist/teptris.mjs";
 import initApi from "../src/index.js";
 
 const mod = await init();
-const { loads, dump, engineVersion } = initApi(mod);
+const { loads, dump, dumpJson, engineVersion } = initApi(mod);
 
 test("loads returns natural JSON", () => {
   const doc = loads('name = "wasm"\nport = 8080\nratio = 1.5\non = true\n' +
@@ -51,6 +51,23 @@ test("dump accepts plain JS objects", () => {
 
 test("dump rejects non-table roots", () => {
   assert.throws(() => dump([1, 2]), TypeError);
+});
+
+test("dumpJson emits host JSON (untagged)", () => {
+  const v = { i: 42, f: 3.5, t: true, s: "hi", at: "2026-10-09T12:00:00Z" };
+  const j = JSON.parse(dumpJson(v));
+  assert.deepEqual(j, v);
+});
+
+test("dumpJson maps non-finite floats to null", () => {
+  const j = JSON.parse(dumpJson({ nan: NaN, inf: Infinity, ok: 1.0 }));
+  assert.equal(j.nan, null);
+  assert.equal(j.inf, null);
+  assert.equal(j.ok, 1.0);
+});
+
+test("dumpJson rejects non-table roots like dump", () => {
+  assert.throws(() => dumpJson([1, 2]), TypeError);
 });
 
 test("engineVersion reports", () => {
