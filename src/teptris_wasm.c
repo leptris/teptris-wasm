@@ -122,13 +122,15 @@ int teptris_wasm_builder_close(void *b) {
     return teptris_builder_close(b);
 }
 
-/* finish -> canonical TOML in g_toml (same accessor pattern as the
- * parse-side JSON) */
+/* finish -> emit into a global buffer (same accessor pattern as the
+ * parse-side JSON): the dump path offers canonical TOML and the
+ * host-facing natural JSON (engine 0.3.0). */
 static char *g_toml;
 static size_t g_toml_len;
 
-EMSCRIPTEN_KEEPALIVE
-int teptris_wasm_builder_finish(void *b) {
+static int finish_with(void *b,
+                       teptris_status (*emit)(const teptris_document *,
+                                              char **, size_t *)) {
     teptris_document *doc = NULL;
     teptris_status st = teptris_builder_finish(b, &doc);
     if (st != TEPTRIS_OK) {
@@ -136,7 +138,7 @@ int teptris_wasm_builder_finish(void *b) {
     }
     char *buf = NULL;
     size_t len = 0;
-    st = teptris_document_emit(doc, &buf, &len);
+    st = emit(doc, &buf, &len);
     teptris_document_free(doc);
     if (st != TEPTRIS_OK) {
         return (int)st;
@@ -144,6 +146,16 @@ int teptris_wasm_builder_finish(void *b) {
     g_toml = buf;
     g_toml_len = len;
     return TEPTRIS_OK;
+}
+
+EMSCRIPTEN_KEEPALIVE
+int teptris_wasm_builder_finish(void *b) {
+    return finish_with(b, teptris_document_emit);
+}
+
+EMSCRIPTEN_KEEPALIVE
+int teptris_wasm_builder_finish_json_natural(void *b) {
+    return finish_with(b, teptris_document_emit_json_natural);
 }
 
 EMSCRIPTEN_KEEPALIVE
