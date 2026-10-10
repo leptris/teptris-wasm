@@ -1,21 +1,26 @@
 {
   "name": "teptris-wasm",
   "version": "0.3.1",
-  "description": "TOML for JavaScript at libteptris speed (WebAssembly, no fallback) \u2014 version tracks the engine ({engine}.{iteration}; npm semver is 3-part)",
+  "description": "TOML for JavaScript/TypeScript at libteptris speed (WebAssembly, no fallback) - version tracks the engine ({engine}.{iteration}; npm semver is 3-part)",
   "type": "module",
   "main": "src/index.js",
   "exports": {
-    ".": "./src/index.js"
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    }
   },
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "build": "./build.sh",
-    "test": "node --test test/test.mjs"
+    "test": "node --test test/test.mjs test/package.test.mjs"
   },
   "license": "MIT",
   "engines": {
     "node": ">=20"
-  }
+  },
+  "types": "src/index.d.ts"
 }

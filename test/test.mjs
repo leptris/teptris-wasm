@@ -1,10 +1,17 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import init from "../dist/teptris.mjs";
-import initApi from "../src/index.js";
+import initModule from "../dist/teptris.mjs";
+import teptrisInit, { init, initApi } from "../src/index.js";
 
-const mod = await init();
-const { loads, dump, dumpJson, engineVersion } = initApi(mod);
+// the consumer path: init() loads + instantiates + wraps
+const { loads, dump, dumpJson, engineVersion } = await init();
+
+test("initApi wraps a raw module (advanced path)", async () => {
+  const mod = await initModule();
+  const api = initApi(mod);
+  assert.deepEqual(api.loads("a = 1"), { a: 1 });
+  assert.equal(api.engineVersion(), engineVersion());
+});
 
 test("loads returns natural JSON", () => {
   const doc = loads('name = "wasm"\nport = 8080\nratio = 1.5\non = true\n' +
