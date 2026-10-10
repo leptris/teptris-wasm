@@ -1,5 +1,5 @@
 /**
- * teptris-wasm — TOML 1.1 for JavaScript/TypeScript at libteptris
+ * teptris — TOML 1.1 for JavaScript/TypeScript at libteptris
  * speed (WebAssembly, no fallback).
  *
  *   const teptris = await init();

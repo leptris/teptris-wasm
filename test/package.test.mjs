@@ -44,7 +44,7 @@ test("a fresh consumer can install and use the package", () => {
                  { cwd: consumer, encoding: "utf8" });
     const script = `
       import assert from "node:assert/strict";
-      const { init } = await import("teptris-wasm");
+      const { init } = await import("teptris");
       const t = await init();
       const doc = t.loads('title = "pkg"\\npi = 3.5\\nat = 2026-10-09T12:00:00Z\\n');
       assert.equal(doc.title, "pkg");
@@ -82,7 +82,7 @@ test("the type declarations type-check against a consumer", () => {
       include: ["check.ts"],
     }));
     writeFileSync(join(consumer, "check.ts"), `
-      import { init, type TeptrisApi } from "teptris-wasm";
+      import { init, type TeptrisApi } from "teptris";
       const api: TeptrisApi = await init();
       const doc = api.loads('a = 1\\n[b]\\nc = "x"\\n');
       const n: number | null = doc.a as number;
