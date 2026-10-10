@@ -108,6 +108,8 @@ function buildValue(mod, b, key, v, errs) {
   }
 }
 
+import createModule from "../dist/teptris.mjs";
+
 export function initApi(mod) {
   const { UTF8ToString, stringToUTF8, lengthBytesUTF8 } = mod;
 
@@ -200,4 +202,12 @@ export function initApi(mod) {
   return { loads, dump, dumpJson, engineVersion };
 }
 
-export default initApi;
+// The consumer entry: instantiate the engine once, get the API.
+//   const teptris = await init();
+//   teptris.loads("a = 1");
+export async function init() {
+  const mod = await createModule();
+  return initApi(mod);
+}
+
+export default init;
