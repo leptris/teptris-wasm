@@ -1,10 +1,10 @@
-# teptris-wasm
+# teptris (JavaScript/TypeScript)
 
 TOML for JavaScript at libteptris speed — the engine compiled to
 WebAssembly (emscripten, ES module), no fallback.
 
 ```js
-import { init } from "teptris-wasm";
+import { init } from "teptris";
 
 const teptris = await init();
 teptris.loads('a = 1');               // → { a: 1 }
